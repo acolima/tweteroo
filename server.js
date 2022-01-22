@@ -20,17 +20,24 @@ function latestsTweets(){
 }
 
 app.post("/sign-up", (req, res) => {
-  user.push(req.body)
-  res.send("OK")
+  const username = req.body.username
+  const avatar = req.body.avatar
+ 
+  if(!username || !avatar )
+    res.status(400).send("Todos os campos são obrigatórios!")
+  else {
+    user.push({username, avatar})
+    res.send("OK")
+  }
 })
 
 app.post("/tweets", (req, res) => {
-  let tweet = {
-    ...req.body,
-    avatar: user[0].avatar
+  if(!req.body.tweet)
+  res.status(400).send("Todos os campos são obrigatórios!")
+  else{
+    tweets.push({...user[0], tweet: req.body.tweet})
+    res.sendStatus(201)    
   }
-  tweets.push(tweet)
-  res.send("OK")
 })
 
 app.get("/tweets", (req, res) => {
