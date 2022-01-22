@@ -6,7 +6,7 @@ const app = express()
 app.use(json())
 app.use(cors())
 
-const user = []
+const users = []
 const tweets = [] 
 
 function latestsTweets(){
@@ -26,17 +26,20 @@ app.post("/sign-up", (req, res) => {
   if(!username || !avatar )
     res.status(400).send("Todos os campos são obrigatórios!")
   else {
-    user.push({username, avatar})
+    users.push({username, avatar})
     res.send("OK")
   }
 })
 
 app.post("/tweets", (req, res) => {
+  const username = req.headers.user
+
   if(!req.body.tweet)
-  res.status(400).send("Todos os campos são obrigatórios!")
+    res.status(400).send("Todos os campos são obrigatórios!")
   else{
-    tweets.push({...user[0], tweet: req.body.tweet})
-    res.sendStatus(201)    
+    const userPost = users.find(user => user.username === username)
+    tweets.push({...userPost, tweet: req.body.tweet})
+    res.status(201).send("OK")    
   }
 })
 
@@ -44,6 +47,13 @@ app.get("/tweets", (req, res) => {
   if(tweets.length === 0)
     res.send(tweets)
   else res.send(latestsTweets())
+})
+
+app.get("/tweets/:username", (req, res) => {
+  const filteredTweets = tweets.filter(tweet => 
+    tweet.username === req.params.username  
+  )
+  res.send(filteredTweets)
 })
 
 app.listen(5000)
